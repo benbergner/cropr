@@ -15,7 +15,10 @@ arXiv: https://arxiv.org/abs/2412.00965
 ## Usage
 
 Check ```cls/CLASSIFICATION.md``` for training a Cropr model on ImageNet.
+<<<<<<< HEAD
 Check ```segm/SEGMENTATION.md``` for training a Cropr model on ADE20k.
+=======
+>>>>>>> e7b642b745143ddc372187f0e7131584f2fdbfbf
 
 ## Citation
 
