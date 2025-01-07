@@ -13,7 +13,7 @@ python main.py \
 --batch_size 256 \
 --accum_steps 4 \
 ```
-This should result in a top-1 val accuracy of 85.8 ([logs](../logs/cls_unpruned.txt))
+This should result in a top-1 val accuracy of ~85.8 ([logs](../logs/cls_unpruned.txt))
 
 To fine-tune an MAE-pretrained ViT-L with Cropr and LLF on ImageNet-1k, run:
 ```
@@ -27,4 +27,4 @@ python main.py \
 --cropr_pruning_rate 8 \
 --cropr_llf true \
 ```
-This should result in a top-1 val accuracy of 85.3 ([logs](../logs/cls_cropr_llf.txt))
+This should result in a top-1 val accuracy of ~85.3 ([logs](../logs/cls_cropr_llf.txt))

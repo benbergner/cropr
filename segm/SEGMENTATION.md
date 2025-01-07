@@ -12,7 +12,7 @@ python main.py \
 --batch_size 8 \
 --accum_steps 1 \
 ```
-This should result in an mIoU of x.x ([logs](../logs/segm_unpruned.txt))
+This should result in an mIoU of ~56.8 ([logs](../logs/segm_unpruned.txt))
 
 To fine-tune an EVA-pretrained ViT-L with Cropr and LLF on ADE20k, run:
 ```
@@ -25,4 +25,4 @@ python main.py \
 --cropr_pruning_rate 40 \
 --cropr_num_queries 1024 \
 ```
-This should result in an mIoU of x.x ([logs](../logs/segm_cropr_llf.txt))
+This should result in an mIoU of ~56.7 ([logs](../logs/segm_cropr_llf.txt))
