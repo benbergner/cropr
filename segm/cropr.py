@@ -101,7 +101,7 @@ class CrossAttention(nn.Module):
         return x, scores
 
 
-class ClassificationHead(nn.Module):
+class SegmentationHead(nn.Module):
     def __init__(self, embed_dim, num_classes):
         super().__init__()
         self.norm = nn.LayerNorm(embed_dim)
@@ -122,9 +122,9 @@ class ClassificationHead(nn.Module):
 class Cropr(nn.Module):
     def __init__(
         self,
-        pruning_rate: int = 8,
-        num_queries: int = 1,
-        num_classes: int = 1000,
+        pruning_rate: int = 40,
+        num_queries: int = 1024,
+        num_classes: int = 80,
         embed_dim: int = 1024,
         num_heads: int = 16,
         pre_attn_norm: bool = False,
@@ -160,35 +160,48 @@ class Cropr(nn.Module):
         )
 
         if training:
-            self.head = ClassificationHead(embed_dim, num_classes)
+            self.head = SegmentationHead(embed_dim, num_classes)
 
-    def prune(self, x, scores):
+    def prune(self, x, scores, pos, idx):
 
-        M = x.shape[1]
+        B, M, D = x.shape
         num_keep = M - self.pruning_rate
 
-        idx = torch.argsort(scores, dim=1, descending=True, stable=False)
-        x_reorder = torch.gather(x, 1, idx.unsqueeze(-1).expand(-1, -1, x.shape[-1]))
+        # Sort scores in descending order, get idx of sorted scores
+        idx_sorted = torch.argsort(scores, dim=1, descending=True, stable=False)
 
+        # Reorder
+        x_reorder = torch.gather(x, 1, idx_sorted.unsqueeze(-1).expand(-1, -1, D))
+        pos_reorder = torch.gather(
+            pos, 1, (idx_sorted[:, 1:] - 1).unsqueeze(-1).expand(-1, -1, pos.shape[-1])
+        )  # skip first id, which is CLS token
+        idx_reorder = torch.gather(idx, 1, idx_sorted).view(B, M)
+
+        # Select keep and pruned tokens
         x = x_reorder[:, :num_keep]
-        x_p = x_reorder[:, num_keep:]
+        x_r = x_reorder[:, num_keep:]
+        pos = pos_reorder[:, : num_keep - 1]  # account for CLS token
+        pos_r = pos_reorder[:, num_keep - 1 :]
+        idx = idx_reorder[:, :num_keep]
+        idx_r = idx_reorder[:, num_keep:]
 
-        return x, x_p
+        return x, x_r, pos, pos_r, idx, idx_r
 
-    def forward(self, x, inference=False):
+    def forward(self, x, pos, idx, inference=False):
+
         if inference:
             scores = self.cross_attn.forward_scorer(x)
         else:
-            # use detach to stop gradients from flowing back
+            # use detach to stop gradient flow
             x_aggr, scores = self.cross_attn(x.detach())
 
         scores[:, 0] = math.inf  # retain CLS token
 
-        x, x_p = self.prune(x, scores)
+        x, x_r, pos, pos_r, idx, idx_r = self.prune(x, scores, pos, idx)
 
         if inference:
-            return x, x_p, None
+            return x, x_r, pos, pos_r, idx, idx_r, None
 
         pred = self.head(x_aggr)
 
-        return x, x_p, pred
+        return x, x_r, pos, pos_r, idx, idx_r, pred

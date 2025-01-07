@@ -52,7 +52,7 @@ class VisionTransformer(timm.models.vision_transformer.VisionTransformer):
                         v_proj=cropr_cfg["v_proj"],
                         mlp=cropr_cfg["mlp"],
                         mlp_ratio=cropr_cfg["mlp_ratio"],
-                        training=self.training,
+                        training=cropr_cfg["training"],
                     )
                     for i in range(num_cropr_modules)
                 ]

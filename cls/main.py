@@ -37,6 +37,7 @@ def main(args):
                 "v_proj": args.cropr_v_proj,
                 "mlp": args.cropr_mlp,
                 "mlp_ratio": args.cropr_mlp_ratio,
+                "training": True,
             }
         )
     args.cropr_cfg = cropr_cfg
