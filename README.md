@@ -22,10 +22,11 @@ Check ```segm/SEGMENTATION.md``` for training a Cropr model on ADE20k.
 ## Citation
 
 ```bibtex
-@article{bergner2024token,
-  title={Token Cropr: Faster ViTs for Quite a Few Tasks},
+@inproceedings{bergner2025token,
+  title={Token cropr: Faster vits for quite a few tasks},
   author={Bergner, Benjamin and Lippert, Christoph and Mahendran, Aravindh},
-  journal={arXiv preprint arXiv:2412.00965},
-  year={2024}
+  booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference},
+  pages={9740--9750},
+  year={2025}
 }
 ```
